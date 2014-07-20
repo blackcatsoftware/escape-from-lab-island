@@ -9,3 +9,7 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 eclipse.project {
     name = appName + "-core"
 }
+
+dependencies {
+    compile group: 'com.roundtriangles.games', name: 'gdx-artemis', version: '0.5'
+}
