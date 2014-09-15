@@ -60,4 +60,10 @@ public class Velocity implements Component
     {
         velocity.set(0.0f, 0.0f);
     }
+    
+    @Override
+    public String toString()
+    {
+        return velocity.toString();
+    }
 }

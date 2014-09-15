@@ -60,4 +60,10 @@ public class Position implements Component
     {
         position.set(0.0f, 0.0f);
     }
+    
+    @Override
+    public String toString()
+    {
+        return position.toString();
+    }
 }
