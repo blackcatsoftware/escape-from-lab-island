@@ -14,11 +14,11 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 public class PlayerInputSystem extends EntityProcessingSystem implements InputProcessor
 {
-    static public final float MAX_VELOCITY_X = 100f;
-    static public final float ACCELERATION_X = 100f;
+    static public final float MAX_VELOCITY_X = 5f;
+    static public final float ACCELERATION_X = 0.5f;
     
-    static public final float VELOCITY_Y_THRESHOLD = 0.05f;
-    static public final float IMPULSE_Y = 50f;
+    static public final float VELOCITY_Y_THRESHOLD = 0.01f;
+    static public final float IMPULSE_Y = 0.15f;
     
     
     private ComponentMapper<Box2dComponent> b2d_mapper = null;

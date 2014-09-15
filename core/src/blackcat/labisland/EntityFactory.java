@@ -29,7 +29,7 @@ public class EntityFactory
             
             // Fixture
             CircleShape circle = new CircleShape();
-            circle.setRadius(1f);
+            circle.setRadius(0.1f);
             
             FixtureDef fix_def = new FixtureDef();
             fix_def.shape = circle;
@@ -68,7 +68,7 @@ public class EntityFactory
             
             // Fixture
             PolygonShape rect = new PolygonShape();
-            rect.setAsBox(EscapeFromLabIslandGame.WIDTH, 5.0f);
+            rect.setAsBox(EscapeFromLabIslandGame.DEFAULT_SCENE_WIDTH, 0.5f);
             
             body.createFixture(rect, 0.0f);
             
@@ -101,7 +101,7 @@ public class EntityFactory
             
             // Fixture
             PolygonShape rect = new PolygonShape();
-            rect.setAsBox(5f, 0.5f);
+            rect.setAsBox(0.5f, 0.05f);
             
             body.createFixture(rect, 0.0f);
             

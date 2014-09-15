@@ -8,13 +8,16 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 
 public class EscapeFromLabIslandGame extends Game
 {
-    static public final int WIDTH = 800;
-    static public final int HEIGHT = 600;
+    static public final int DEFAULT_VIEWPORT_WIDTH = 800;
+    static public final int DEFAULT_VIEWPORT_HEIGHT = 600;
+    
+    static public final float DEFAULT_SCENE_WIDTH = 10f;
+    static public final float DEFAULT_SCENE_HEIGHT = 7.5f;
+    static public final float DEFAULT_SCENE_ASPECT_RATIO = DEFAULT_SCENE_WIDTH / DEFAULT_SCENE_HEIGHT;
     
     static public final float B2D_TIME_STEP = 1/60f;
     static public final int B2D_VELOCITY_ITERATIONS = 10;
@@ -49,20 +52,20 @@ public class EscapeFromLabIslandGame extends Game
     public void create()
     {
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 100, 75);
+        resize(DEFAULT_VIEWPORT_WIDTH, DEFAULT_VIEWPORT_HEIGHT);
         
         createWorld();
         
-        EntityFactory.createGround(world, b2d_world, 0, 0);
+        EntityFactory.createGround(world, b2d_world, DEFAULT_SCENE_WIDTH / 2, 0);
         
-        EntityFactory.createPlatform(world, b2d_world, 20, 10);
-        EntityFactory.createPlatform(world, b2d_world, 35, 20);
-        EntityFactory.createPlatform(world, b2d_world, 50, 30);
-        EntityFactory.createPlatform(world, b2d_world, 65, 40);
-        EntityFactory.createPlatform(world, b2d_world, 80, 50);
-        EntityFactory.createPlatform(world, b2d_world, 95, 60);
+        EntityFactory.createPlatform(world, b2d_world, 2.0f, 1.0f);
+        EntityFactory.createPlatform(world, b2d_world, 3.5f, 2.0f);
+        EntityFactory.createPlatform(world, b2d_world, 5.0f, 3.0f);
+        EntityFactory.createPlatform(world, b2d_world, 6.5f, 4.0f);
+        EntityFactory.createPlatform(world, b2d_world, 8.0f, 5.0f);
+        EntityFactory.createPlatform(world, b2d_world, 9.5f, 6.0f);
         
-        EntityFactory.createPlayer(world, b2d_world, 5, 20);
+        EntityFactory.createPlayer(world, b2d_world, 0.5f, 2.0f);
     }
     
     /**
@@ -97,12 +100,33 @@ public class EscapeFromLabIslandGame extends Game
     @Override
     public void resize(int width, int height)
     {
-        // TODO Intelligently pick aspect ratio
-        float center_x = width / 2.0f;
-        float center_y = height / 2.0f;
+        // Target viewport is 100x75, so scale the first dimension to "clip"
+        // to that ratio, and let the other one float larger
+        
+        float aspect = (float) width / (float) height;
+        
+        float scene_width = DEFAULT_SCENE_WIDTH;
+        float scene_height = DEFAULT_SCENE_HEIGHT;
+        
+        Vector2 default_scene_center = new Vector2(scene_width / 2, scene_height / 2);
+        
+        if (aspect > DEFAULT_SCENE_ASPECT_RATIO)
+        {
+            // Too wide
+            scene_width = aspect * scene_height;
+        }
+        else
+        {
+            // Too tall
+            scene_height = scene_width / aspect;
+        }
+        
+        Vector2 scene_center = new Vector2(scene_width / 2, scene_height / 2);
+        Vector2 slide = default_scene_center.sub(scene_center);
         
         camera.viewportWidth = width;
         camera.viewportHeight = height;
-        camera.setToOrtho(false, 100, 75);
+        camera.setToOrtho(false, scene_width, scene_height);
+        camera.translate(slide);
     }
 }
