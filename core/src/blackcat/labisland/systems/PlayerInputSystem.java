@@ -1,6 +1,6 @@
 package blackcat.labisland.systems;
 
-import blackcat.labisland.components.Velocity;
+import blackcat.labisland.components.Box2dComponent;
 
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
@@ -9,17 +9,19 @@ import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 public class PlayerInputSystem extends EntityProcessingSystem implements InputProcessor
 {
-    static public final float MAX_VELOCITY_X = 400f;
-    static public final float MAX_VELOCITY_Y = 300f;
+    static public final float MAX_VELOCITY_X = 100f;
+    static public final float ACCELERATION_X = 100f;
     
-    static public final float ACCELERATION_X = 24f;
-    static public final float ACCELERATION_Y = 18f;
+    static public final float VELOCITY_Y_THRESHOLD = 0.05f;
+    static public final float IMPULSE_Y = 50f;
     
     
-    private ComponentMapper<Velocity> vel_mapper = null;
+    private ComponentMapper<Box2dComponent> b2d_mapper = null;
     
     private boolean up = false;
     private boolean down = false;
@@ -30,7 +32,7 @@ public class PlayerInputSystem extends EntityProcessingSystem implements InputPr
     @SuppressWarnings("unchecked")
     public PlayerInputSystem()
     {
-        super(Filter.allComponents(Velocity.class));
+        super(Filter.allComponents(Box2dComponent.class));
     }
     
     @Override
@@ -38,32 +40,32 @@ public class PlayerInputSystem extends EntityProcessingSystem implements InputPr
     {
         Gdx.input.setInputProcessor(this);
         
-        vel_mapper = world.getMapper(Velocity.class);
+        b2d_mapper = world.getMapper(Box2dComponent.class);
     }
 
     @Override
     protected void process(Entity entity)
     {
-        Velocity velocity = vel_mapper.get(entity);
+        Box2dComponent box = b2d_mapper.get(entity);
         
-        if (up && velocity.getDY() < MAX_VELOCITY_Y)
+        // TODO Need better way to target player components only... Maybe InputControllableComponent extends Box2dComponent?
+        if (BodyType.DynamicBody != box.getBody().getType()) return;
+        
+        Vector2 velocity = box.getBody().getLinearVelocity();
+        
+        if (up && Math.abs(velocity.y) < VELOCITY_Y_THRESHOLD)
         {
-            velocity.setDY(Math.min(velocity.getDY() + ACCELERATION_Y, MAX_VELOCITY_Y));
+            box.getBody().applyLinearImpulse(new Vector2(0, IMPULSE_Y), box.getBody().getPosition(), true);
         }
         
-        if (down && velocity.getDY() > -MAX_VELOCITY_Y)
+        if (left && velocity.x > -MAX_VELOCITY_X)
         {
-            velocity.setDY(Math.max(velocity.getDY() - ACCELERATION_Y, -MAX_VELOCITY_Y));
+            box.getBody().applyForceToCenter(-ACCELERATION_X, 0, true);
         }
         
-        if (left && velocity.getDX() > -MAX_VELOCITY_X)
+        if (right && velocity.x < MAX_VELOCITY_X)
         {
-            velocity.setDX(Math.max(velocity.getDX() - ACCELERATION_X, -MAX_VELOCITY_X));
-        }
-        
-        if (right && velocity.getDX() < MAX_VELOCITY_X)
-        {
-            velocity.setDX(Math.min(velocity.getDX() + ACCELERATION_X, MAX_VELOCITY_X));
+            box.getBody().applyForceToCenter(ACCELERATION_X, 0, true);
         }
     }
     
